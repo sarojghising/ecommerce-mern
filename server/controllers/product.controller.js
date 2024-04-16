@@ -28,6 +28,9 @@ const getAllProducts = catchAsyncErrors(async (req, res) => {
 
 const createProduct = catchAsyncErrors(async (req, res, next) => {
 
+
+    req.body.createdBy = req.user.id;
+
     const product = await Product.create(req.body);
 
     res.status(200).json({
@@ -44,6 +47,7 @@ const updateProduct = catchAsyncErrors(async (req, res, next) => {
 
     if (!product) return next(new ErrorHandler("Product not found.", 404));
 
+    req.body.createdBy = req.user.id;
     product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true, useFindAndModify: false });
 
     res.status(200).json({
