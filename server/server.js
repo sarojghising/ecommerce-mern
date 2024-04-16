@@ -3,6 +3,15 @@ import dotenv from 'dotenv'
 import { connectDB } from './config/db.js';
 
 
+// handling uncaught exception  -- caught undefined variables... 
+process.on("uncaughtException", (err) => {
+    console.log(`Error of Uncaught Exception: ${err.message}`);
+    console.log(`Shutting down the server due to uncaught exception.`);
+    server.close(() => {
+        process.exit(1);
+    });    
+});
+
 
 dotenv.config({path: "server/config/.env"})
 connectDB()
