@@ -16,6 +16,21 @@ class ApiFeatures {
         this.query = this.query.find({...keyword}); 
 
         return this;
+    }
+
+    filter() {
+
+        const oldQueryCopy = {...this.queryStr};
+
+        // remove fields for category filter
+        const excludedFields = ['page', 'sort', 'limit', 'fields','keyword'];
+
+        excludedFields.forEach(el => delete oldQueryCopy[el]);
+
+        this.query = this.query.find(oldQueryCopy);
+
+        return this;
+
 
     }
 

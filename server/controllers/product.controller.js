@@ -8,7 +8,7 @@ import ErrorHandler from '../utils/errorhandler.js';
 
 const getAllProducts = catchAsyncErrors(async (req, res) => {
    
-const apiFeature = new ApiFeatures(Product.find(), req.query).search();
+const apiFeature = new ApiFeatures(Product.find(), req.query).search().filter();
     const products = await apiFeature.query;
 
     res.status(200).json({
