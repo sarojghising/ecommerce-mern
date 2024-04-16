@@ -36,13 +36,25 @@ const login = catchAsyncErrors(async (req,res,next) => {
 });
 
 
+const logout = catchAsyncErrors(async (req,res,next) => {
+
+    res.status(200)
+    .clearCookie("token")
+    .status(200)
+    .json({ message: "Successfully logged out 😏 🍀" });
+
+});
+
+
+
 
 
 
 
 export {
     register,
-    login
+    login,
+    logout
 }
 
 

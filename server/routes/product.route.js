@@ -6,6 +6,7 @@ import {
     getProductDetails,
     updateProduct
 } from '../controllers/product.controller.js';
+import { isAuthenticated } from '../middleware/auth.js';
 
 
 const router = express.Router();
