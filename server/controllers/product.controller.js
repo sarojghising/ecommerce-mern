@@ -3,7 +3,9 @@ import { Product } from '../models/product.model.js';
 import ErrorHandler from '../utils/errorhandler.js';
 
 
-const getAllProducts = async (req, res) => {
+
+
+const getAllProducts = catchAsyncErrors(async (req, res) => {
 
     const products = await Product.find();
 
@@ -11,7 +13,8 @@ const getAllProducts = async (req, res) => {
         success: true,
         products
     });
-}
+});
+
 
 const createProduct = catchAsyncErrors(async (req, res, next) => {
 
