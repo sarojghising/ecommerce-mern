@@ -1,13 +1,15 @@
 import { catchAsyncErrors } from '../middleware/catchAsyncErrors.js';
 import { Product } from '../models/product.model.js';
+import ApiFeatures from '../utils/apiFeatures.js';
 import ErrorHandler from '../utils/errorhandler.js';
 
 
 
 
 const getAllProducts = catchAsyncErrors(async (req, res) => {
-
-    const products = await Product.find();
+   
+const apiFeature = new ApiFeatures(Product.find(), req.query).search();
+    const products = await apiFeature.query;
 
     res.status(200).json({
         success: true,
