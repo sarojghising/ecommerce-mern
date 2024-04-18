@@ -3,6 +3,7 @@ import { User } from '../models/user.model.js';
 import ErrorHandler from '../utils/errorhandler.js';
 import { sendToken } from '../utils/jwtToken.js';
 import { sendResetPasswordEmailURL } from '../utils/sendEmail.js';
+import crypto from 'crypto'
 
 
 const register = catchAsyncErrors(async (req, res, next) => {
@@ -76,7 +77,8 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
         res.status(200).json({
             success: true, 
             message: `Email sent to ${user.email} Sucessfully.`
-        })
+        });
+
     } catch (error) {
 
         user.resetPasswordToken = undefined;
@@ -92,7 +94,38 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
 
 
-})
+});
+
+
+const resetPassword = catchAsyncErrors(async(req,res,next) => {
+
+    const resetPasswordToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
+
+    const user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpiredAt : {$gt: Date.now()}
+    });
+
+    if(!user) return next(new ErrorHandler("reset password token is invalid or has been expired.", 401));
+
+    if(req.body.password !== req.body.confirmPassword) return next(new ErrorHandler("new password and confirm password should matched.", 401));
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiredAt = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    sendToken(user, 200, res);
+
+    res.status(200).json({
+        success: true, 
+        message: "Password Changed Successfully.",
+        user
+    });
+
+});
+
 
 
 
@@ -104,7 +137,8 @@ export {
     register,
     login,
     logout,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }
 
 
