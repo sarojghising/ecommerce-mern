@@ -3,62 +3,67 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
     name: {
-        type: String, 
+        type: String,
         required: [true, "Please enter product name"],
         trim: true
     },
     description: {
-        type: String, 
+        type: String,
         required: [true, "Please enter product description"]
     },
     price: {
-        type: Number, 
+        type: Number,
         required: [true, "Please enter product price."],
         maxLength: [8, "price cannot exceed 8 characters."]
     },
-    rating: {
-        type: Number, 
+    ratings: {
+        type: Number,
         default: 0
     },
     images: [
-      {
-        public_id: {
-            type: String, 
-            required: true
-        },
-        url: {
-            type: String, 
-            required: true
+        {
+            public_id: {
+                type: String,
+                required: true
+            },
+            url: {
+                type: String,
+                required: true
+            }
         }
-      }
     ],
     category: {
-        type: String, 
+        type: String,
         required: [true, "Please enter product category"],
     },
     stock: {
-        type: Number, 
+        type: Number,
         required: [true, "Please enter product stock."],
         maxLength: [4, "stock cannot exceed 4 characters."],
         default: 1
     },
     numOfReviews: {
-        type: Number, 
+        type: Number,
         default: 0
     },
     reviews: [
         {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+                required: true
+            },
             name: {
                 type: String,
-                required: true, 
+                required: true,
             },
             rating: {
-                type: Number, 
-                required: true 
+                type: Number,
+                required: true
             },
             comment: {
-                type: String, 
-                required: true 
+                type: String,
+                required: true
             }
         }
     ],
@@ -67,7 +72,7 @@ const productSchema = new mongoose.Schema({
         ref: "User",
         required: true
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 
 
