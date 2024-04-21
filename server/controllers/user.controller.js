@@ -127,6 +127,46 @@ const resetPassword = catchAsyncErrors(async(req,res,next) => {
 });
 
 
+const getUserDetails = catchAsyncErrors(async(req,res,next) => {
+
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        success: true, 
+        user
+    });
+
+});
+
+
+const updatePassword = catchAsyncErrors(async(req,res,next) => {
+
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isMatch = await user.comparePassword(req.body.oldPassword);
+
+    if (!isMatch) return next(new ErrorHandler("old password is invalid", 401));
+
+    if(req.body.newPassword !== req.body.confirmPassword) {
+        return next(new ErrorHandler("password does not matched", 401));
+    }
+
+    user.password = req.body.newPassword;
+
+    await user.save();
+
+    sendToken(user,200,res);
+
+
+});
+
+
+
+
+
+
+
+
 
 
 
@@ -138,7 +178,9 @@ export {
     login,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getUserDetails,
+    updatePassword
 }
 
 
