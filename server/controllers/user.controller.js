@@ -179,6 +179,36 @@ const updateProfile = catchAsyncErrors(async (req, res, next) => {
 
 
 
+// get All Users -- admin
+const getAllUsers = catchAsyncErrors(async(req,res,next) => {
+
+    const users = await User.find();
+
+    res.status(200).json({
+        success: true, 
+        users
+    });
+});
+
+//get single user from all users -- admin
+const fetchSingleUser = catchAsyncErrors(async(req,res,next) => {
+
+    const user = await User.findById(req.params.id);
+
+    if(!user) return next(new ErrorHandler(`User does not exist with id: ${req.params.id}`,404));
+
+    res.status(200).json({
+        success: true, 
+        user
+    });
+});
+
+
+
+
+
+
+
 
 
 
@@ -199,7 +229,9 @@ export {
     resetPassword,
     getUserDetails,
     updatePassword,
-    updateProfile
+    updateProfile,
+    getAllUsers,
+    fetchSingleUser
 }
 
 
