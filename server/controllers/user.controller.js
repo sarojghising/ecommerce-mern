@@ -68,14 +68,14 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
     try {
         await sendResetPasswordEmailURL({
-            email: user.email, 
+            email: user.email,
             subject: `Ecommerce | Password Recovery`,
             message
 
         });
 
         res.status(200).json({
-            success: true, 
+            success: true,
             message: `Email sent to ${user.email} Sucessfully.`
         });
 
@@ -83,11 +83,11 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
         user.resetPasswordToken = undefined;
         user.resetPasswordExpiredAt = undefined;
-        await user.save({validateBeforeSave: false});
+        await user.save({ validateBeforeSave: false });
 
 
         return next(new ErrorHandler(error.message, 500));
-        
+
     }
 
 
@@ -97,18 +97,18 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-const resetPassword = catchAsyncErrors(async(req,res,next) => {
+const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     const resetPasswordToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
 
     const user = await User.findOne({
         resetPasswordToken,
-        resetPasswordExpiredAt : {$gt: Date.now()}
+        resetPasswordExpiredAt: { $gt: Date.now() }
     });
 
-    if(!user) return next(new ErrorHandler("reset password token is invalid or has been expired.", 401));
+    if (!user) return next(new ErrorHandler("reset password token is invalid or has been expired.", 401));
 
-    if(req.body.password !== req.body.confirmPassword) return next(new ErrorHandler("new password and confirm password should matched.", 401));
+    if (req.body.password !== req.body.confirmPassword) return next(new ErrorHandler("new password and confirm password should matched.", 401));
 
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
@@ -119,7 +119,7 @@ const resetPassword = catchAsyncErrors(async(req,res,next) => {
     sendToken(user, 200, res);
 
     res.status(200).json({
-        success: true, 
+        success: true,
         message: "Password Changed Successfully.",
         user
     });
@@ -127,19 +127,19 @@ const resetPassword = catchAsyncErrors(async(req,res,next) => {
 });
 
 
-const getUserDetails = catchAsyncErrors(async(req,res,next) => {
+const getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findById(req.user.id);
 
     res.status(200).json({
-        success: true, 
+        success: true,
         user
     });
 
 });
 
 
-const updatePassword = catchAsyncErrors(async(req,res,next) => {
+const updatePassword = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findById(req.user.id).select("+password");
 
@@ -147,7 +147,7 @@ const updatePassword = catchAsyncErrors(async(req,res,next) => {
 
     if (!isMatch) return next(new ErrorHandler("old password is invalid", 401));
 
-    if(req.body.newPassword !== req.body.confirmPassword) {
+    if (req.body.newPassword !== req.body.confirmPassword) {
         return next(new ErrorHandler("password does not matched", 401));
     }
 
@@ -155,10 +155,28 @@ const updatePassword = catchAsyncErrors(async(req,res,next) => {
 
     await user.save();
 
-    sendToken(user,200,res);
+    sendToken(user, 200, res);
 
 
 });
+
+const updateProfile = catchAsyncErrors(async (req, res, next) => {
+
+    const newData = { name: req.body.name, email: req.body.email };
+
+    // we will add cloudinary later 
+
+    const user = await User.findByIdAndUpdate(req.user.id, newData, { new: true, runValidators: true, useFindAndModify: false });
+
+
+    res.status(200).json({
+        success: true,
+        message: "Update Profile Successfully.",
+        user
+    });
+
+});
+
 
 
 
@@ -180,7 +198,8 @@ export {
     forgotPassword,
     resetPassword,
     getUserDetails,
-    updatePassword
+    updatePassword,
+    updateProfile
 }
 
 
