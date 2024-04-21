@@ -25,7 +25,6 @@ const register = catchAsyncErrors(async (req, res, next) => {
     sendToken(user, 201, res);
 
 });
-
 const login = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findOne({ email: req.body.email }).select("+password");
@@ -36,8 +35,6 @@ const login = catchAsyncErrors(async (req, res, next) => {
 
     sendToken(user, 200, res);
 });
-
-
 const logout = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200)
@@ -46,7 +43,6 @@ const logout = catchAsyncErrors(async (req, res, next) => {
         .json({ message: "Successfully logged out." });
 
 });
-
 const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findOne({ email: req.body.email });
@@ -95,8 +91,6 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
 
 });
-
-
 const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     const resetPasswordToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
@@ -125,8 +119,6 @@ const resetPassword = catchAsyncErrors(async (req, res, next) => {
     });
 
 });
-
-
 const getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findById(req.user.id);
@@ -137,8 +129,6 @@ const getUserDetails = catchAsyncErrors(async (req, res, next) => {
     });
 
 });
-
-
 const updatePassword = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findById(req.user.id).select("+password");
@@ -159,7 +149,6 @@ const updatePassword = catchAsyncErrors(async (req, res, next) => {
 
 
 });
-
 const updateProfile = catchAsyncErrors(async (req, res, next) => {
 
     const newData = { name: req.body.name, email: req.body.email };
@@ -176,9 +165,6 @@ const updateProfile = catchAsyncErrors(async (req, res, next) => {
     });
 
 });
-
-
-
 // get All Users -- admin
 const getAllUsers = catchAsyncErrors(async(req,res,next) => {
 
@@ -202,6 +188,51 @@ const fetchSingleUser = catchAsyncErrors(async(req,res,next) => {
         user
     });
 });
+
+// update user role --admin
+const updateUserRole = catchAsyncErrors(async(req,res,next) => {
+
+    const newData = {name: req.body.name, email: req.body.email, role: req.body.role};
+
+    const user = await User.findByIdAndUpdate(req.params.id, newData, {new: true, runValidators: true, useFindAndModify: false});
+
+    if(!user) return next(new ErrorHandler("user not found.",404));
+
+
+    res.status(200).json({
+        success: true,
+        message: "Update Role Sucessfully !!",
+        user
+    })
+
+});
+
+// delete user -- admin 
+const deleteUser = catchAsyncErrors(async(req,res,next) => {
+
+    // we will remove cloudinary later 
+    const user = await User.findById(req.params.id);
+
+    if(!user) return next(new ErrorHandler("user not found.",400));
+
+    await user.deleteOne();
+
+    res.status(200).json({
+        success: true,
+        message: "Deleted User !!",
+    })
+
+
+
+
+
+})
+
+
+
+
+
+
 
 
 
@@ -231,7 +262,9 @@ export {
     updatePassword,
     updateProfile,
     getAllUsers,
-    fetchSingleUser
+    fetchSingleUser,
+    updateUserRole,
+    deleteUser
 }
 
 

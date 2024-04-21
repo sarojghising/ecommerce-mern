@@ -1,5 +1,5 @@
 import express from 'express'
-import { fetchSingleUser, forgotPassword, getAllUsers, getUserDetails, login, logout, register, resetPassword, updatePassword, updateProfile } from '../controllers/user.controller.js';
+import { deleteUser, fetchSingleUser, forgotPassword, getAllUsers, getUserDetails, login, logout, register, resetPassword, updatePassword, updateProfile, updateUserRole } from '../controllers/user.controller.js';
 import { isAuthenticated,authorizeRoles } from '../middleware/auth.js';
 
 
@@ -16,7 +16,12 @@ router.route("/me").get(isAuthenticated,getUserDetails);
 router.route("/password/update").put(isAuthenticated, updatePassword);
 router.route("/me/update").put(isAuthenticated, updateProfile);
 router.route("/admin/users").get(isAuthenticated, authorizeRoles("admin"), getAllUsers);
-router.route("/admin/user/:id").get(isAuthenticated, authorizeRoles("admin"), fetchSingleUser);
+router.route("/admin/user/:id")
+.get(isAuthenticated, authorizeRoles("admin"), fetchSingleUser)
+.put(isAuthenticated, authorizeRoles("admin"), updateUserRole)
+.delete(isAuthenticated, authorizeRoles("admin"), deleteUser);
+
+
 
 
 
