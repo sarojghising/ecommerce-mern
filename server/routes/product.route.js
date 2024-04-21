@@ -7,7 +7,7 @@ import {
     updateProduct
 } from '../controllers/product.controller.js';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth.js';
-import { createOrUpdateReview } from '../controllers/product.reviews.controller.js';
+import { createOrUpdateReview, deleteReview, getProductReviews } from '../controllers/product.reviews.controller.js';
 
 
 const router = express.Router();
@@ -23,6 +23,9 @@ router.route("/admin/product/:id").put(isAuthenticated, authorizeRoles("admin"),
 router.route("/product/:id").get(getProductDetails);
 
 router.route("/review").put(isAuthenticated, createOrUpdateReview);
+
+router.route("/reviews").get(getProductReviews).delete(isAuthenticated,deleteReview);
+
 
 
 

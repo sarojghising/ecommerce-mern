@@ -1,5 +1,6 @@
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
 import { Product } from "../models/product.model.js";
+import ErrorHandler from "../utils/errorhandler.js";
 
 const createOrUpdateReview = catchAsyncErrors(async (req, res, next) => {
 
@@ -51,7 +52,62 @@ const createOrUpdateReview = catchAsyncErrors(async (req, res, next) => {
 
 });
 
+const getProductReviews = catchAsyncErrors(async(req,res,next) => {
+
+    const product = await Product.findById(req.query.productId);
+
+    if(!product) return next(new ErrorHandler("product not found.",400));
+
+    const reviews = product.reviews;
+
+    res.status(200).json({
+        success: true,
+        reviews
+    });
+
+});
+
+const deleteReview = catchAsyncErrors(async(req,res,next) => {
+
+
+    const product = await Product.findById(req.query.productId);
+
+    if(!product) return next(new ErrorHandler("product not found.",400));
+
+
+    const reviews = product.reviews.filter(rev => rev._id.toString() !== req.query.id.toString()); // remove review 
+
+    let avg = 0;
+
+    reviews.forEach((rev) => {
+        avg += rev.rating;
+    });
+
+    const ratings = avg / reviews.length;
+
+
+    const numOfReviews = reviews.length;
+
+
+    await Product.findByIdAndUpdate(req.query.productId, {reviews, ratings, numOfReviews}, {new: true, runValidators: true, useFindAndModify: false});
+
+
+
+    
+    res.status(200).json({
+        success: true,
+        message: "Delete Review"
+    });
+
+
+});
+
+
+
+
 
 export {
-    createOrUpdateReview
+    createOrUpdateReview,
+    getProductReviews,
+    deleteReview
 }
